@@ -84,7 +84,21 @@ La cubierta debe permitir la apertura y el cierre, facilitar el acceso al interi
 
 ### Materiales y equipos
 
-Para el montaje se utilizaron o contemplaron los siguientes elementos: Arduino Uno, sensor DHT11, sensor de fuerza FSR400, pantalla OLED I²C, tres LED indicadores, dos ventiladores de 5 V, transistor TIP122, diodo 1N4007, resistencias, protoboard, cables jumper, fuente regulada de laboratorio de 5 V, bombillo como fuente de calor, estructura transparente y computador con Arduino IDE.
+Para el montaje se utilizaron o contemplaron los siguientes elementos: 
+- Arduino Uno
+- Sensor DHT11
+- Sensor de fuerza FSR400
+- Pantalla OLED I²C
+- Tres LED indicadores
+- Dos ventiladores de 5 V
+- Transistor TIP122
+- Diodo 1N4007
+- Resistencias
+- Protoboard
+- Cables jumper
+- Fuente regulada de laboratorio de 5 V
+- Bombillo como fuente de calor
+- Estructura transparente 
 
 El Arduino Uno se utiliza para adquirir las señales y controlar las salidas digitales. El DHT11 mide temperatura y humedad, mientras que el FSR400 detecta cambios de fuerza. La pantalla OLED muestra los valores y los LED indican el estado térmico.
 
@@ -262,7 +276,7 @@ No obstante, sus limitaciones son importantes. El bombillo no cuenta con regulac
 
 Por tanto, el prototipo es útil como herramienta educativa para comprender el funcionamiento general de una incubadora neonatal, pero no ofrece las mismas capacidades que los equipos comerciales. La diferencia no depende únicamente del precio, sino también de la precisión de los sensores, la capacidad de control, la confiabilidad y las medidas de seguridad necesarias para proteger al paciente.
 
-## 14. CONCLUSIONES
+## 14. CONCLUSION
 
 La construcción del prototipo de incubadora neonatal permitió reconocer la importancia de controlar las condiciones ambientales para favorecer la estabilidad térmica del neonato, así como identificar los componentes principales que intervienen en su funcionamiento. El sistema desarrollado integra un Arduino Uno, un sensor DHT11, un FSR400, una pantalla OLED, indicadores luminosos y ventiladores, permitiendo representar algunos de los procesos de medición y control presentes en estos equipos. Sin embargo, debido a que el bombillo permanece encendido sin regulación automática, no se puede garantizar un control preciso de la temperatura; de igual manera, la estimación del peso requiere calibrar el FSR400 con masas patrón conocidas para determinar su error. Estos resultados evidencian que, aunque es posible implementar funciones básicas mediante componentes electrónicos de bajo costo, controlar variables como la temperatura y el peso con gran precisión requiere sensores calibrados, mecanismos de regulación adecuados y pruebas experimentales que permitan validar el desempeño del sistema. Como siguiente paso, se propone incorporar el control automático del calentamiento, mejorar la regulación de la humedad y realizar mediciones repetidas de temperatura y peso para cuantificar los errores y evaluar las mejoras del prototipo.
 
