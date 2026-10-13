@@ -148,6 +148,136 @@ La estimación del peso se mostró en gramos y se comparó con una masa patrón.
 
 Es importante señalar que el bombillo no se encuentra conectado a una salida de control del Arduino. Por esta razón, el programa puede activar la ventilación, pero no puede regular automáticamente la potencia de calentamiento.
 
+### Codigo en Arduino IDE
+
+    #include <Wire.h>
+    #include <Adafruit_GFX.h>
+    #include <Adafruit_SSD1306.h>
+    #include <DHT.h>
+    
+    #define DHTPIN 2
+    #define DHTTYPE DHT11
+    
+    #define FSR A0
+    #define VENTILADOR 6
+    #define LED_AZUL 8
+    #define LED_VERDE 9
+    #define LED_ROJO 10
+    
+    #define ANCHO 128
+    #define ALTO 64
+    
+    Adafruit_SSD1306 oled(ANCHO, ALTO, &Wire, -1);
+    DHT dht(DHTPIN, DHTTYPE);
+    
+    bool ventiladorActivo = false;
+    
+    void setup() {
+      Serial.begin(9600);
+    
+      pinMode(VENTILADOR, OUTPUT);
+      pinMode(LED_AZUL, OUTPUT);
+      pinMode(LED_VERDE, OUTPUT);
+      pinMode(LED_ROJO, OUTPUT);
+    
+      digitalWrite(VENTILADOR, LOW);
+    
+      dht.begin();
+    
+      if (!oled.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
+        while (true) {
+        }
+      }
+    
+      oled.clearDisplay();
+      oled.setTextColor(SSD1306_WHITE);
+      oled.setTextSize(1);
+      oled.setCursor(0, 0);
+      oled.println("INCUBADORA");
+      oled.println("Iniciando...");
+      oled.display();
+    
+      delay(2000);
+    }
+    
+    void loop() {
+      float temperatura = dht.readTemperature();
+      int lecturaFSR = analogRead(FSR);
+    
+      // Control de temperatura
+      if (!isnan(temperatura)) {
+        if (temperatura > 37.5) {
+          ventiladorActivo = true;
+        }
+    
+        if (temperatura < 36.0) {
+          ventiladorActivo = false;
+        }
+    
+        digitalWrite(VENTILADOR, ventiladorActivo);
+    
+        // LED de temperatura
+        digitalWrite(LED_AZUL, temperatura < 36.0);
+        digitalWrite(LED_VERDE,
+                     temperatura >= 36.0 && temperatura <= 37.5);
+        digitalWrite(LED_ROJO, temperatura > 37.5);
+      }
+    
+      // Estimacion orientativa del peso
+      float peso = lecturaFSR * 2000.0 / 900.0;
+    
+      if (peso > 2000) {
+        peso = 2000;
+      }
+    
+      // Mostrar en OLED
+      oled.clearDisplay();
+      oled.setTextSize(1);
+      oled.setCursor(0, 0);
+      oled.println("INCUBADORA");
+    
+      if (isnan(temperatura)) {
+        oled.println("Error en DHT11");
+      } else {
+        oled.print("Temperatura: ");
+        oled.print(temperatura, 1);
+        oled.println(" C");
+    
+        oled.print("Estado: ");
+        if (temperatura < 36.0) {
+          oled.println("BAJA");
+        } else if (temperatura <= 37.5) {
+          oled.println("ESTABLE");
+        } else {
+          oled.println("ALTA");
+        }
+      }
+    
+      oled.print("FSR: ");
+      oled.println(lecturaFSR);
+    
+      oled.print("Peso aprox: ");
+      oled.print(peso, 0);
+      oled.println(" g");
+    
+      oled.print("Ventilador: ");
+      oled.println(ventiladorActivo ? "ENCENDIDO" : "APAGADO");
+    
+      oled.display();
+    
+      // Datos por monitor serial
+      Serial.print("Temperatura: ");
+      Serial.print(temperatura);
+      Serial.print(" C | FSR: ");
+      Serial.print(lecturaFSR);
+      Serial.print(" | Peso aprox: ");
+      Serial.print(peso, 0);
+      Serial.print(" g | Ventilador: ");
+      Serial.println(ventiladorActivo ? "ON" : "OFF");
+    
+      delay(1000);
+    }
+
 ### Adquisición de temperatura y humedad
 
 Durante las pruebas, el sensor DHT11 permitió obtener las mediciones ambientales de la cámara. Los valores se mostraron en la pantalla OLED, lo que facilitó observar los cambios producidos por el calentamiento y la circulación del aire.
