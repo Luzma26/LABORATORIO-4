@@ -1,289 +1,315 @@
-# DISEÑO Y CONSTRUCCION DE UNA INCUBADORA NEOONATAL A ESCALA
+# DISEÑO Y CONSTRUCCIÓN DE UNA INCUBADORA NEONATAL A ESCALA
 
-**Luz Marina Valderrama-5600741.**
+**Luz Marina Valderrama – 5600741**
 
-## INTRODUCCION
+## INTRODUCCIÓN
 
+Las incubadoras neonatales son equipos biomédicos diseñados para proporcionar un ambiente controlado a los recién nacidos que requieren asistencia para mantener una temperatura corporal adecuada. Su importancia es especialmente relevante en neonatos prematuros, debido a que su capacidad para regular la temperatura puede ser limitada. Por esta razón, el control de variables como la temperatura, la humedad y la circulación del aire es fundamental para favorecer condiciones ambientales apropiadas [1], [2].
 
-### Objetivo General: 
+Las incubadoras comerciales integran diferentes componentes, como una cubierta transparente, sensores de temperatura, sistemas de calentamiento, ventiladores, controladores electrónicos y alarmas. Dependiendo del modelo, también pueden incorporar mecanismos de humidificación, monitorización clínica y medición del peso [3], [4]. Estos elementos permiten mantener condiciones ambientales controladas y supervisar el funcionamiento del equipo.
+
+En esta práctica se desarrolló un prototipo a escala de una incubadora neonatal mediante un Arduino Uno, un sensor DHT11, un sensor de fuerza FSR400, una pantalla OLED, tres LED indicadores y dos ventiladores. El sistema permite adquirir variables ambientales, visualizar las mediciones y activar un ventilador cuando la temperatura supera el límite establecido. También se incorporó un sensor de fuerza para explorar la estimación del peso mediante cambios en una señal eléctrica.
+
+El proyecto se dividió en dos partes. En la primera se revisaron los componentes de una incubadora neonatal y se plantearon los principios de los circuitos de control térmico y medición del peso. En la segunda se construyó el modelo físico a escala y se integraron los componentes electrónicos. Sin embargo, el montaje presenta limitaciones: el bombillo utilizado como fuente de calor no está regulado automáticamente por el Arduino, el sensor FSR400 requiere calibración y la pantalla utilizada es OLED, no una LCD convencional. Por lo tanto, el prototipo representa una aproximación académica al funcionamiento de una incubadora y no un equipo apto para uso clínico.
+
+## OBJETIVOS
+
+### Objetivo general
+
 Reconocer la importancia de las incubadoras neonatales en la salud del neonato.
-### Objetivos Específicos
-• Identificar las partes principales que componen una incubadora neonatal.
 
-• Desarrollar un sistema que emule el modo de operación de una incubadora neonatal.
+### Objetivos específicos
 
-• Evaluar cómo impacta el control de variables como temperatura, humedad y flujo de aire en la salud del neonato.
+- Identificar las partes principales que componen una incubadora neonatal.
+- Desarrollar un sistema que emule el modo de operación de una incubadora neonatal.
+- Evaluar cómo impacta el control de variables como temperatura, humedad y flujo de aire en la salud del neonato.
 
-## METODOLOGIA
-### Revisión de la actividad electrodérmica
+## METODOLOGÍA
 
+### PARTE A. DISEÑO Y SIMULACIÓN DEL SISTEMA
 
+### Identificación de las partes principales de una incubadora neonatal
+
+Se realizó una revisión del funcionamiento de las incubadoras neonatales para identificar los componentes que permiten mantener condiciones ambientales controladas. Entre los elementos principales se encuentra la cubierta transparente, cuya función es permitir la observación del neonato y reducir el intercambio directo de aire con el ambiente exterior.
+
+La cámara interna constituye el espacio donde se mantiene el ambiente controlado. El sistema de calentamiento proporciona la energía térmica necesaria para elevar la temperatura, mientras que los ventiladores favorecen la circulación del aire y ayudan a distribuir el calor. Los sensores permiten medir las condiciones internas y enviar información al controlador electrónico, que utiliza las mediciones para determinar las acciones de regulación.
+
+Otros componentes importantes son el panel de control, las alarmas y los sistemas de monitorización. En equipos comerciales, estos elementos permiten detectar condiciones fuera de los límites establecidos y alertar al personal encargado. Dependiendo del modelo, también pueden incorporarse sistemas de humidificación y dispositivos para medir el peso [3], [4].
+
+La revisión permitió reconocer que el funcionamiento de una incubadora no depende únicamente de producir calor, sino de medir las condiciones internas, regularlas y detectar posibles fallas. Por ello, el sistema de control y los sensores deben funcionar de manera coordinada.
+
+### Diseño del circuito de control de temperatura
+
+La guía solicita diseñar y simular un circuito eléctrico de control de lazo cerrado capaz de mantener la temperatura entre 36 °C y 37,5 °C. Para cumplir este propósito, se plantea un sistema compuesto por un sensor de temperatura, un controlador, un elemento calefactor y un ventilador.
+
+El sensor mide continuamente la temperatura interna y envía la información al controlador. Este compara la temperatura medida con el intervalo de referencia y determina si debe aumentar o reducir la acción de calentamiento. El ventilador permite favorecer la circulación del aire y, cuando se requiere, contribuir a disminuir la temperatura.
+
+El funcionamiento por realimentación puede representarse mediante el siguiente esquema:
+
+Temperatura de referencia → Comparación con la temperatura medida → Controlador → Calefactor y ventilador → Temperatura de la cabina → Sensor de temperatura → Realimentación al controlador.
+
+El intervalo de referencia establecido para el prototipo es de 36 °C a 37,5 °C. La diferencia entre la temperatura de referencia y la temperatura medida se expresa como:
+
+e(t) = T_ref - T_medida
+
+Donde e(t) representa el error de temperatura, T_ref es la temperatura de referencia y T_medida corresponde a la temperatura registrada por el sensor.
+
+Para la implementación se utilizó un sensor DHT11 conectado al Arduino Uno. La lógica de funcionamiento contempla tres estados: temperatura baja, temperatura dentro del intervalo y temperatura alta.
+
+Cuando la temperatura es inferior a 36 °C, se enciende el LED azul. Cuando está entre 36 °C y 37,5 °C, se enciende el LED verde. Si supera los 37,5 °C, se enciende el LED rojo y se activa el ventilador superior.
+
+El ventilador se desactiva cuando la temperatura desciende por debajo de 36 °C. Esta diferencia entre los umbrales de activación y desactivación introduce una histéresis que reduce los cambios constantes de estado cuando la temperatura se encuentra cerca del límite.
+
+Sin embargo, el montaje construido no constituye un sistema de control térmico completo de lazo cerrado, porque el bombillo permanece encendido y no es regulado automáticamente por el Arduino. El sistema puede medir la temperatura y activar la ventilación, pero no puede modificar directamente la potencia de calentamiento. Por tanto, para cumplir completamente el requisito de la guía se necesitaría incorporar un actuador que permita regular el calentador y verificar su respuesta mediante simulación y pruebas experimentales.
+
+### Diseño del circuito de medición del peso
+
+La guía solicita diseñar un circuito capaz de medir el peso y mostrarlo mediante una pantalla LCD o displays de siete segmentos. Para explorar esta función se utilizó un sensor de fuerza FSR400, cuyo principio de funcionamiento se basa en la variación de su resistencia eléctrica cuando se aplica una fuerza sobre su superficie.
+
+El sensor se conectó mediante un divisor de tensión. Una de sus terminales se conectó a 5 V y la otra al nodo de lectura analógica A0 del Arduino Uno. Desde este nodo se conectó una resistencia de 10 kΩ a tierra. De esta forma, los cambios de resistencia del sensor producen variaciones de tensión que pueden ser adquiridas por el microcontrolador.
+
+La lectura analógica obtenida se utiliza para reconocer cambios en la fuerza aplicada. Sin embargo, esta lectura no representa directamente un peso en gramos. Para convertirla en una estimación de masa es necesario realizar una calibración con masas patrón conocidas y establecer una relación experimental entre las lecturas y los valores de referencia.
+
+La información se muestra mediante una pantalla OLED con comunicación I²C. Aunque la guía contempla una pantalla LCD o displays de siete segmentos, la OLED utilizada permite visualizar caracteres y valores numéricos. Por tanto, cumple una función de visualización equivalente para el prototipo, pero no corresponde literalmente a los tipos de pantalla indicados en la guía.
+
+### PARTE B. CONSTRUCCIÓN DEL MODELO A ESCALA
+
+### Construcción de la estructura
+
+Se construyó una cámara a escala con una cubierta transparente para permitir observar el interior. La estructura representa el espacio de una incubadora neonatal y permite ubicar el sistema de calentamiento, los ventiladores, el sensor ambiental y los componentes electrónicos.
+
+La guía establece unas dimensiones aproximadas de 90 cm × 40 cm × 45 cm. Las dimensiones finales del prototipo deben verificarse mediante medición directa y registrarse según la estructura construida. No se consideran confirmadas las dimensiones propuestas por la guía si no han sido comprobadas físicamente.
+
+La cubierta debe permitir la apertura y el cierre, facilitar el acceso al interior y reducir el intercambio de calor con el ambiente. El material utilizado debe ofrecer visibilidad y proporcionar una barrera física apropiada para las pruebas del prototipo.
+
+### Materiales y equipos
+
+Para el montaje se utilizaron o contemplaron los siguientes elementos: Arduino Uno, sensor DHT11, sensor de fuerza FSR400, pantalla OLED I²C, tres LED indicadores, dos ventiladores de 5 V, transistor TIP122, diodo 1N4007, resistencias, protoboard, cables jumper, fuente regulada de laboratorio de 5 V, bombillo como fuente de calor, estructura transparente y computador con Arduino IDE.
+
+El Arduino Uno se utiliza para adquirir las señales y controlar las salidas digitales. El DHT11 mide temperatura y humedad, mientras que el FSR400 detecta cambios de fuerza. La pantalla OLED muestra los valores y los LED indican el estado térmico.
+
+El ventilador inferior permanece encendido para favorecer la circulación del aire, mientras que el ventilador superior se controla mediante el transistor TIP122. El bombillo proporciona calor, pero en el montaje actual permanece independiente del control automático.
 
 ### Consideraciones de seguridad eléctrica
 
+El circuito electrónico se alimentó mediante una fuente regulada de 5 V de corriente continua. Antes de conectar los componentes, se verificó la polaridad de la alimentación y se comprobó que no existieran cortocircuitos entre los rieles de la protoboard.
 
+El bombillo se mantuvo separado del circuito de baja tensión. Debido a que su alimentación puede involucrar tensión de red, cualquier conexión correspondiente debe ser realizada o verificada por una persona cualificada y bajo supervisión del docente.
 
-### Selección de la región anatómica
+El sistema no debe dejarse funcionando sin vigilancia debido al riesgo de sobrecalentamiento. Además, el prototipo no debe utilizarse para mantener las condiciones térmicas de un recién nacido. Las pruebas se realizan exclusivamente con fines académicos y en condiciones controladas.
 
+### Montaje del circuito electrónico
 
+El montaje se realizó sobre una protoboard, utilizando el Arduino Uno como unidad central de procesamiento. La alimentación de 5 V se distribuyó a los rieles de la protoboard y se estableció una tierra común para los componentes de baja tensión.
 
-### Montaje del dispositivo
+El sensor DHT11 se conectó a 5 V y GND, mientras que su salida de datos se conectó al pin digital D2 del Arduino. Esta conexión permite obtener las lecturas de temperatura y humedad utilizadas por el programa.
 
-El sistema desarrollado estuvo compuesto principalmente por:
+El sensor FSR400 se conectó mediante un divisor de tensión: una terminal a 5 V y la otra al nodo analógico A0. Desde este nodo se conectó una resistencia de 10 kΩ a GND.
 
-• ESP32.
-• Sensor GSR.
-• Electrodos.
-• Cables de conexión.
-• Fuente de alimentación mediante power bank.
-• Computador con MATLAB.
-• Comunicación Bluetooth.
+La pantalla OLED se conectó mediante el bus I²C, utilizando A4 como línea SDA y A5 como línea SCL. La alimentación y la tierra se conectaron a los terminales correspondientes. La configuración del programa depende de la dirección I²C y de las características de la pantalla utilizada.
 
+Los LED azul, verde y rojo se conectaron a los pines digitales D8, D9 y D10, respectivamente, cada uno con una resistencia limitadora de corriente. El LED azul indica una temperatura inferior al intervalo de referencia, el verde representa una temperatura dentro del intervalo y el rojo indica que se ha superado el límite superior.
 
-### Programación de la ESP32
+El ventilador inferior se conectó para permanecer encendido durante el funcionamiento del sistema. Para controlar el ventilador superior se utilizó un transistor TIP122 como elemento de conmutación, con una resistencia en la base y un diodo 1N4007 para proteger el circuito frente a los transitorios eléctricos generados por el motor. La conexión del transistor, el diodo y la alimentación debe verificarse antes de energizar el sistema.
 
-Se utilizó la versión 2.0.11 del paquete ESP32 de Espressif Systems en Arduino IDE.
+### Programación del Arduino Uno
 
-El programa final se encargó de:
+El programa del Arduino se diseñó para leer las variables ambientales, presentar la información en la pantalla OLED y controlar los indicadores luminosos y el ventilador superior.
 
-1. Inicializar la comunicación Bluetooth.
-2. Configurar el GPIO 34 como entrada analógica.
-3. Realizar continuamente la lectura del sensor GSR.
-4. Enviar el valor obtenido mediante Bluetooth.
-5. Mantener la adquisición durante la prueba.
+La temperatura medida se compara con el intervalo de referencia comprendido entre 36 °C y 37,5 °C. Cuando la temperatura es inferior a 36 °C, se enciende el LED azul. Cuando la temperatura se encuentra dentro del intervalo, se enciende el LED verde. Si la temperatura supera los 37,5 °C, se enciende el LED rojo y se activa el ventilador superior.
 
-La estructura fundamental empleada fue:
+El ventilador se desactiva cuando la temperatura desciende por debajo de 36 °C. Esta lógica permite observar cómo una medición puede utilizarse para modificar el estado de un actuador.
 
-    #include "BluetoothSerial.h"
+La pantalla OLED se utiliza para mostrar la temperatura, la humedad y la lectura analógica del FSR400. Sin embargo, la lectura del sensor de fuerza no puede interpretarse directamente como gramos sin una calibración previa con masas conocidas.
 
-    BluetoothSerial SerialBT;
+Es importante señalar que el bombillo no se encuentra conectado a una salida de control del Arduino. Por esta razón, el programa puede activar la ventilación, pero no puede regular automáticamente la potencia de calentamiento.
 
-    const int GSR_PIN = 34;
-    
-    void setup()
-    {
-        Serial.begin(9600);
-        SerialBT.begin("GSR_ESP32");
-        analogReadResolution(10);
-    }
-    
-    void loop()
-    {
-        int gsr = analogRead(GSR_PIN);
+### Adquisición de temperatura y humedad
 
-    SerialBT.println(gsr);
+Durante las pruebas, el sensor DHT11 se utiliza para obtener las mediciones ambientales de la cámara. Los valores se muestran en la pantalla OLED, lo que permite observar los cambios producidos por el calentamiento y la circulación del aire.
 
-    delay(20);
-    }
-La resolución del ADC se estableció en 10 bits, por lo que los valores adquiridos se encontraron aproximadamente entre 0 y 1023 ADC.
+Para evaluar el comportamiento térmico, se deben registrar la temperatura inicial, la temperatura máxima, la temperatura mínima y el tiempo necesario para observar una respuesta del ventilador. También debe comprobarse si la temperatura permanece dentro del intervalo de referencia durante el periodo de observación.
 
-La transmisión Bluetooth permitió eliminar la conexión física entre la ESP32 y el computador durante la adquisición final, utilizando la alimentación independiente mediante power bank.
+El DHT11 presenta limitaciones de precisión y tiempo de respuesta en comparación con sensores especializados para equipos médicos. Por lo tanto, las mediciones obtenidas deben interpretarse como parte de una práctica académica y no como una validación de precisión clínica.
 
-### Comunicación inalámbrica
+### Estimación del peso mediante el FSR400
 
-Una vez programada la ESP32, se estableció la comunicación Bluetooth con el computador mediante el dispositivo denominado:
+El FSR400 es un sensor resistivo cuya resistencia cambia cuando se aplica una fuerza sobre su superficie. En el circuito, este cambio produce una variación de tensión que se lee mediante la entrada analógica A0 del Arduino.
 
-  GSR_ESP32
+Para establecer una relación entre la lectura analógica y el peso, se realiza una calibración experimental. Primero se registra la lectura sin carga y posteriormente se colocan masas conocidas sobre una plataforma que distribuya la fuerza de forma reproducible. Con estos datos se puede construir una curva de calibración y estimar la masa correspondiente a una lectura determinada.
 
-El computador creó un puerto COM asociado al enlace Bluetooth. MATLAB utilizó dicho puerto para recibir los datos enviados por la ESP32.
+El error absoluto de la estimación se calcula mediante:
 
-Durante la configuración se presentaron inicialmente problemas con los puertos COM y con la conexión Bluetooth. Finalmente se consiguió establecer comunicación y recibir correctamente los valores GSR en MATLAB.
+E_a = |m_estimada - m_patron|
 
-### Adquisición y procesamiento en MATLAB
+El error relativo porcentual se calcula mediante:
 
-MATLAB se utilizó para recibir los datos provenientes de la ESP32, generar la gráfica en tiempo real y almacenar los resultados.
+E_r(%) = (E_a / m_patron) × 100
 
-El programa se configuró para adquirir aproximadamente:
+Donde m_estimada es la masa estimada por el sistema y m_patron es la masa conocida utilizada como referencia. El error relativo no se calcula cuando la masa patrón es cero.
 
-  Fs = 50Hz
+La exactitud de la estimación depende de la distribución de la carga, el contacto mecánico con el sensor, la repetibilidad de las mediciones y el intervalo de masas utilizado durante la calibración. Debido a estas limitaciones, el FSR400 no equivale a una balanza clínica.
 
-durante:
+### Cálculo de costos
 
-T=60s
+Para determinar el costo total del prototipo se deben registrar los precios reales de los componentes y sumar los costos parciales de cada elemento. Se deben incluir el Arduino Uno, el sensor DHT11, el FSR400, la pantalla OLED, los ventiladores, el transistor TIP122, el diodo 1N4007, los LED, las resistencias, la protoboard, los cables, la fuente de alimentación y los materiales de la estructura.
 
-por lo que se esperaban aproximadamente:
+El costo total se obtiene mediante la expresión:
 
-N=FsT = 50(60)=3000
+C_total = C_Arduino + C_DHT11 + C_FSR400 + C_OLED + C_ventiladores + C_componentes + C_estructura + C_alimentacion
 
-muestras.
+Los precios deben registrarse en pesos colombianos y corresponder a los valores reales de compra. Si algunos elementos fueron proporcionados por el laboratorio, deben identificarse por separado para distinguir el costo de los materiales adquiridos del valor total de los recursos utilizados.
 
-Los datos fueron almacenados en vectores de tiempo y GSR.
+No se asignan valores monetarios supuestos a los componentes, ya que no se dispone de las facturas o cotizaciones completas del prototipo.
 
-Posteriormente se aplicó un suavizado mediante media móvil:
+### Evaluación del sistema
 
-    xf = movmean(x,10);
+La evaluación del prototipo debe realizarse mediante pruebas de funcionamiento de cada componente y del sistema integrado. Se comprueba que el sensor ambiental entregue lecturas, que la pantalla muestre los valores, que los LED respondan al intervalo de temperatura programado y que el ventilador superior se active cuando se supera el límite establecido.
 
-Este procesamiento permitió reducir pequeñas fluctuaciones rápidas y facilitar la identificación de la tendencia general de la señal.
+También se debe evaluar el sensor FSR400 mediante masas patrón para determinar el error de la estimación. Los datos obtenidos deben registrarse para comparar el comportamiento del sistema en diferentes condiciones.
 
-A partir de la señal suavizada se estimó la componente tónica:
+Como no se han proporcionado mediciones experimentales completas de temperatura ni resultados de calibración del peso, estos valores no se presentan como resultados cuantitativos confirmados. La eficacia del sistema debe establecerse a partir de las pruebas realizadas durante la práctica.
 
-    SCL = mean(xf);
-
-y se calculó una componente transitoria aproximada:
-
-    SCR = xf - SCL;
-
-De esta forma fue posible observar tanto la variación lenta de la señal como las respuestas transitorias.
-
-### Calibración
-
-Antes de realizar la prueba final se realizaron mediciones en reposo y durante actividades destinadas a producir cambios en la activación fisiológica.
-
-Durante las primeras pruebas se observaron valores cercanos a:
-
-• Mínimo: 934 ADC
-• Máximo: 971 ADC
-• Promedio: 947,85 ADC
-• SCL: 947,85 ADC
-• SCR máxima: 7,95 ADC
-
-Posteriormente se realizaron pruebas adicionales para establecer rangos de clasificación.
-
-Los datos experimentales mostraron que el valor absoluto de GSR podía desplazarse durante la prueba. Por este motivo, la clasificación no se interpretó únicamente como un valor fisiológico universal, sino como una clasificación experimental relativa a la línea base del sujeto.
-
-Esto es importante porque el nivel de conductancia puede variar entre individuos y también puede verse afectado por temperatura, humedad, movimiento, presión de los electrodos y condiciones de contacto [8], [9].
-
-### Clasificación del nivel de estrés
-
-Se implementó una clasificación experimental en MATLAB mediante tres niveles:
-
-• POCO
-• MODERADO
-• ELEVADO
-
-Los umbrales se determinaron a partir de los valores observados durante las pruebas de calibración y posteriormente se utilizaron en la prueba final.
-
-El programa recibía cada muestra y determinaba el nivel correspondiente. En la consola se mostraba, por ejemplo:
-
-      GSR: 928 ADC   Nivel: MODERADO
-      GSR: 916 ADC   Nivel: POCO
-      GSR: 893 ADC   Nivel: ELEVADO
-
-La clasificación se utilizó como indicador relativo de activación fisiológica y no como diagnóstico clínico de estrés.
 ## RESULTADOS
-### Adquisición de la señal GSR
 
-El sistema consiguió adquirir la señal GSR mediante la ESP32 y transmitirla inalámbricamente al computador.
+### Funcionamiento general del prototipo
 
-Durante las primeras mediciones se observaron valores aproximadamente entre 934 y 971 ADC en condiciones de reposo.
+El prototipo integra los principales componentes electrónicos previstos para representar algunas funciones de una incubadora neonatal a escala. El Arduino Uno actúa como unidad de procesamiento, el sensor DHT11 permite adquirir la temperatura y la humedad, la pantalla OLED facilita la visualización de las mediciones y los LED indican el estado térmico de la cámara.
 
-En las pruebas posteriores se observaron variaciones mayores. En una de las adquisiciones se registraron valores desde aproximadamente 1002 ADC hasta 939 ADC, mostrando una variación suficiente para diferenciar diferentes estados de activación.
+El sistema también incorpora dos ventiladores con funciones diferenciadas. El ventilador inferior permanece encendido para favorecer la circulación del aire, mientras que el ventilador superior responde a la temperatura medida por el sensor. De esta forma, el montaje permite representar una estrategia básica de control ambiental mediante sensores y actuadores.
 
-### Respuesta durante reposo y respiración
+No se dispone de un registro experimental completo que permita establecer el porcentaje de tiempo durante el cual la temperatura permaneció dentro del intervalo de referencia. Por lo tanto, la eficacia térmica debe determinarse mediante las mediciones obtenidas durante las pruebas, sin asumir que el sistema mantiene una temperatura constante.
 
-Durante las pruebas de respiración se observó que una inspiración rápida producía un cambio apreciable en la señal. Sin embargo, después del pico la señal no siempre regresaba exactamente al mismo valor inicial.
+### Respuesta del sistema ante los cambios de temperatura
 
-Este comportamiento no necesariamente representa un error del sistema. La componente tónica de la EDA puede presentar cambios lentos y la recuperación de una respuesta fásica puede tomar tiempo [4]. Además, la señal puede verse afectada por la respiración, movimiento, contacto de los electrodos y otros factores fisiológicos [8].
+El programa establece tres estados de funcionamiento según la temperatura medida. Por debajo de 36 °C, el sistema indica una condición de temperatura baja mediante el LED azul. Entre 36 °C y 37,5 °C, el LED verde representa el intervalo establecido como referencia. Por encima de 37,5 °C, se enciende el LED rojo y se activa el ventilador superior.
 
-Por lo tanto, el retorno de la señal no debe interpretarse obligatoriamente como una recuperación instantánea hasta exactamente el mismo valor de reposo.
+Esta lógica permite demostrar cómo una medición puede utilizarse para modificar el estado de un actuador. Sin embargo, la activación del ventilador no garantiza por sí sola que la temperatura regrese al intervalo deseado, ya que el resultado depende de la potencia del bombillo, el aislamiento de la cámara, la circulación del aire y las condiciones ambientales.
 
-### Prueba de actividad cognitiva
+Además, el bombillo permanece encendido sin regulación automática. En consecuencia, el prototipo no dispone de un control completo del calentamiento y la refrigeración. Para determinar su desempeño real, es necesario registrar las temperaturas durante un periodo definido y comprobar la respuesta del sistema ante los cambios térmicos.
 
-Durante la prueba final se observó un comportamiento más acorde con el objetivo de la práctica.
+### Adquisición de humedad
 
-En la consola se obtuvieron secuencias como:
+El sensor DHT11 permite obtener una lectura de humedad relativa junto con la temperatura. Esta medición resulta útil para observar las condiciones ambientales dentro de la cámara y reconocer que la humedad constituye una variable importante en el cuidado neonatal.
 
-    GSR: 935 ADC   Nivel: ELEVADO
-    GSR: 928 ADC   Nivel: MODERADO
-    GSR: 916 ADC   Nivel: POCO
+No obstante, el prototipo no incorpora un humidificador ni un mecanismo automático para regular la humedad. Por esta razón, el sistema puede medir y mostrar esta variable, pero no garantizar que permanezca dentro de un intervalo específico.
 
-Durante los momentos en los que se realizó una actividad mental que requería mayor concentración se observaron cambios en el nivel de la señal y clasificación como ELEVADO.
+### Lectura del sensor FSR400
 
-Posteriormente, al disminuir la demanda cognitiva, la señal descendió gradualmente y pasó por los niveles MODERADO y POCO.
+El sensor FSR400 permite detectar cambios en la fuerza aplicada mediante variaciones de su resistencia eléctrica. La conexión con el divisor de tensión permite convertir esos cambios en lecturas analógicas que el Arduino puede procesar.
 
-Esto permitió observar cambios tanto ascendentes como descendentes de la señal durante una misma adquisición.
+Sin embargo, una lectura analógica no corresponde directamente a un peso expresado en gramos. Para estimar la masa se requiere una curva de calibración construida con masas patrón conocidas. Como no se cuenta con los datos completos de estas pruebas, no es posible establecer un error numérico confirmado para la medición.
 
-### Resultados de la prueba final
+La calibración debe realizarse colocando las masas sobre una plataforma estable y repitiendo cada medición para observar la variabilidad. Posteriormente, se pueden comparar los valores estimados con los valores de referencia para determinar el error absoluto y relativo.
 
-Los resultados registrados fueron:
+### Comparación general con una incubadora comercial
 
-  RESULTADOS PRUEBA GSR
+El prototipo permite demostrar principios de medición, visualización y control, pero presenta diferencias importantes frente a las incubadoras comerciales. Equipos como la Dräger Isolette 8000 plus incorporan funciones avanzadas de control térmico, monitorización y gestión de humedad, según su configuración [3], [4].
 
-Parámetro	              Resultado
-Línea base	             992,03 ADC
-Mínimo                   939 ADC
-Máximo	                 1002 ADC
-Promedio	               958,40 ADC
+La incubadora YP2000 comercializada por Instrumentalia ofrece funciones de control ambiental y una estructura destinada al cuidado neonatal [5]. Por su parte, la incubadora B3 de LEEX Medical incorpora funciones comerciales de control de temperatura y humidificación, según su configuración [6].
 
-Los datos fueron almacenados en:
+En comparación con estos equipos, el prototipo académico tiene la ventaja de permitir la modificación del programa y la observación directa del funcionamiento de los sensores y actuadores. Sin embargo, no cuenta con regulación automática del calentamiento, control activo de humedad, alarmas clínicas ni un sistema de medición del peso validado.
 
-• GSR_prueba_final.csv
-• GSR_prueba_final.mat
+Por lo tanto, los resultados obtenidos permiten estudiar el funcionamiento básico de una incubadora, pero no demuestran que el sistema tenga la precisión, confiabilidad o seguridad necesarias para sustituir un equipo médico.
 
-La diferencia entre el máximo y mínimo registrado fue:
+## 13. ANÁLISIS DE RESULTADOS
 
-ΔGSR=1002−939
-ΔGSR=63 ADC
-	​
-Este rango muestra que durante la prueba se produjo una variación considerable respecto al rango de fluctuación observado durante algunas condiciones de reposo.
+### Análisis 1. Eficacia del sistema para controlar la temperatura de la cabina y error en el cálculo del peso
 
-### Componentes SCL y SCR
+El sistema desarrollado permite representar algunos de los principios de funcionamiento de una incubadora neonatal mediante la adquisición de temperatura y humedad con el sensor DHT11, la visualización de los datos en una pantalla OLED y la activación de indicadores luminosos y ventiladores mediante un Arduino Uno. De esta manera, se puede observar cómo la medición de una variable ambiental se utiliza para modificar el funcionamiento de un actuador.
 
-La señal presentó una variación lenta de su nivel basal, correspondiente a la componente tónica o SCL, sobre la cual aparecieron variaciones rápidas asociadas con la componente fásica o SCR.
+Para evaluar la respuesta térmica, se estableció como referencia un intervalo de 36 °C a 37,5 °C. Cuando la temperatura es inferior a 36 °C, se enciende el LED azul; cuando se encuentra dentro del intervalo, se enciende el LED verde; y cuando supera los 37,5 °C, se enciende el LED rojo y se activa el ventilador superior. El ventilador inferior permanece encendido para favorecer la circulación del aire.
 
-Este comportamiento coincide con la descripción utilizada habitualmente en el análisis de EDA, donde el SCL representa cambios lentos mientras que las SCR representan respuestas transitorias ante eventos o estímulos [3], [4].
+Este comportamiento demuestra una estrategia básica de control por realimentación. Sin embargo, la eficacia real depende de las mediciones experimentales, del tiempo de respuesta del sensor, de la distribución de la temperatura dentro de la cámara y de la capacidad de los ventiladores para disipar el calor acumulado.
 
-## ANÁLISIS DE RESULTADOS
-  Análisis 1. Eficacia del sistema para monitoreo ambulatorio
+Una limitación importante es que el bombillo utilizado como fuente de calor permanece encendido y no está regulado automáticamente por el Arduino. Por esta razón, el sistema puede responder al aumento de temperatura mediante ventilación, pero no puede reducir directamente la potencia de calentamiento. En consecuencia, no se puede afirmar que la cabina mantenga una temperatura constante sin contar con registros experimentales que lo demuestren.
 
-El sistema desarrollado permitió realizar una medición continua y portátil de la respuesta galvánica cutánea y transmitir los datos de manera inalámbrica.
+Para cuantificar la eficacia térmica, se debe registrar la temperatura durante un periodo definido y calcular el porcentaje de mediciones que permanecen dentro del intervalo de referencia:
 
-Una de las principales ventajas fue que la ESP32 pudo funcionar alimentada mediante una power bank, evitando que el sujeto permaneciera conectado físicamente al computador.
+P(%) = (N_dentro / N_total) × 100
 
-Los sistemas portátiles de EDA son una alternativa utilizada para realizar mediciones fuera de condiciones estrictamente de laboratorio; sin embargo, la calidad de la señal puede verse afectada por movimiento, colocación de electrodos, temperatura, humedad y otros factores [8], [10].
+Donde N_dentro corresponde al número de mediciones entre 36 °C y 37,5 °C, y N_total representa el número total de mediciones registradas.
 
-Por lo tanto, el dispositivo desarrollado resulta apropiado como prototipo académico de monitoreo, aunque sería necesario realizar una validación más rigurosa antes de considerarlo un sistema de medición clínica.
+En cuanto a la estimación del peso, el FSR400 permite detectar cambios en la fuerza aplicada mediante variaciones de su resistencia eléctrica. No obstante, la señal analógica obtenida por el Arduino no representa directamente una masa en gramos. Para establecer esta conversión es necesario realizar una calibración experimental utilizando masas patrón conocidas.
 
-  Análisis 2. Alcance y limitaciones del sistema
+El error absoluto de la estimación se determina mediante:
 
-El principal alcance del sistema es permitir observar cambios relativos de la actividad electrodérmica durante diferentes situaciones.
+E_a = |m_estimada - m_patron|
 
-Los resultados obtenidos muestran que el sistema puede identificar cambios durante actividades cognitivas. Esto es consistente con investigaciones donde la EDA ha mostrado sensibilidad ante tareas que producen estrés cognitivo [11].
+El error relativo porcentual se calcula mediante:
 
-Sin embargo, la GSR no mide directamente el estrés psicológico. La señal representa principalmente cambios relacionados con la activación autonómica y puede verse modificada por diferentes factores fisiológicos y ambientales [1], [8].
+E_r(%) = (E_a / m_patron) × 100
 
-Por ello, un aumento de GSR debe interpretarse como un aumento de activación fisiológica, y no necesariamente como una prueba definitiva de estrés.
+Donde m_estimada corresponde a la masa estimada por el sistema y m_patron representa la masa conocida utilizada como referencia. El error relativo no se calcula cuando la masa patrón es cero.
 
-### ¿Por qué la señal tarda en regresar a su nivel inicial?
+La precisión de esta medición depende de la calibración del sensor, la distribución de la fuerza sobre su superficie y la estabilidad de la plataforma donde se coloca la carga. Además, el FSR400 no debe considerarse equivalente a una balanza clínica calibrada. Sin mediciones realizadas con masas conocidas, no es posible establecer un porcentaje de error experimental.
 
-Durante las pruebas se observó que, después de producirse una respuesta elevada, la señal podía permanecer durante un tiempo en un nivel diferente antes de regresar hacia valores menores.
+En general, el sistema permite comprender los principios de medición y control aplicados a una incubadora neonatal a escala. Sin embargo, para evaluar cuantitativamente su eficacia es necesario registrar los datos experimentales y reconocer que el control térmico y la estimación del peso presentan limitaciones que deben resolverse antes de considerar aplicaciones más exigentes.
 
-Esto puede explicarse por la propia dinámica de la EDA. Las respuestas fásicas presentan una fase de aumento y posteriormente una fase de recuperación, mientras que el componente tónico puede cambiar lentamente durante períodos de varios segundos o minutos [4].
+### Análisis 2. Comparación del sistema desarrollado con los equipos comerciales
 
-Además, la recuperación puede verse afectada por el estado fisiológico del sujeto y por las condiciones de medición.
+El prototipo construido se diferencia de las incubadoras comerciales principalmente por su complejidad, precisión, seguridad y cantidad de variables controladas. Mientras que el sistema académico utiliza componentes electrónicos para demostrar principios básicos de instrumentación, los equipos comerciales están diseñados para proporcionar condiciones ambientales controladas y ofrecer funciones específicas para la atención neonatal.
 
-Por tanto, que la señal no vuelva inmediatamente al valor inicial no implica necesariamente que el sensor esté funcionando incorrectamente.
+La incubadora Dräger Isolette 8000 plus incorpora funciones avanzadas de control térmico, monitorización y gestión de humedad según su configuración, además de opciones de pesaje. Estas características permiten un control más completo que el del prototipo, aunque su adquisición y mantenimiento requieren proveedores especializados [3], [4].
 
-### Relación entre actividad cognitiva y GSR
+Por su parte, la incubadora YP2000 comercializada por Instrumentalia cuenta con una estructura y funciones destinadas al control ambiental neonatal [5]. Durante la consulta comercial se identificó un precio publicado de aproximadamente $53.391.350 COP, incluidos impuestos. Este valor debe confirmarse con el proveedor, ya que puede variar según la disponibilidad, la configuración y las condiciones de venta.
 
-Durante la prueba final se observó que, al realizar actividades que requerían mayor concentración, aparecieron periodos clasificados como ELEVADO.
+La incubadora B3 de LEEX Medical también ofrece funciones comerciales de control de temperatura y humidificación, según la configuración del equipo. Su precio debe solicitarse directamente al fabricante o distribuidor [6].
 
-Posteriormente se observaron periodos MODERADOS y POCO cuando la activación disminuía.
+Frente a estas alternativas, el prototipo académico presenta como ventaja su bajo costo relativo y la posibilidad de modificar el programa para observar la relación entre las mediciones de los sensores y la respuesta de los actuadores. Además, permite aplicar conocimientos de electrónica, programación, adquisición de señales y control de variables físicas.
 
-Este resultado es compatible con investigaciones que han demostrado sensibilidad de la EDA ante el estrés cognitivo [11]. La explicación fisiológica propuesta es que una tarea mental exigente puede aumentar la activación del sistema nervioso simpático, lo cual puede modificar la actividad de las glándulas sudoríparas y producir cambios en la conductancia cutánea [1], [3].
+No obstante, sus limitaciones son importantes. El bombillo no cuenta con regulación automática, no existe un sistema activo de control de humedad, el FSR400 requiere calibración para estimar el peso y el montaje no incorpora las alarmas, redundancias ni las funciones de seguridad de una incubadora clínica. Tampoco se han documentado pruebas de uniformidad térmica, precisión o seguridad eléctrica.
 
-No obstante, la respuesta no debe atribuirse exclusivamente al estrés, debido a que movimiento, respiración y otros factores también pueden generar variaciones en la EDA [8].
+Por tanto, el prototipo es útil como herramienta educativa para comprender el funcionamiento general de una incubadora neonatal, pero no ofrece las mismas capacidades que los equipos comerciales. La diferencia no depende únicamente del precio, sino también de la precisión de los sensores, la capacidad de control, la confiabilidad y las medidas de seguridad necesarias para proteger al paciente.
 
-### Influencia del movimiento
+## 14. CONCLUSIONES
 
-La señal presentó fluctuaciones durante algunas pruebas. Esto es especialmente relevante porque el sistema fue diseñado como dispositivo vestible.
+La construcción del prototipo de incubadora neonatal permitió reconocer la importancia de controlar las condiciones ambientales para favorecer la estabilidad térmica del neonato, así como identificar los componentes principales que intervienen en su funcionamiento. El sistema desarrollado integra un Arduino Uno, un sensor DHT11, un FSR400, una pantalla OLED, indicadores luminosos y ventiladores, permitiendo representar algunos de los procesos de medición y control presentes en estos equipos. Sin embargo, debido a que el bombillo permanece encendido sin regulación automática, no se puede garantizar un control preciso de la temperatura; de igual manera, la estimación del peso requiere calibrar el FSR400 con masas patrón conocidas para determinar su error. Estos resultados evidencian que, aunque es posible implementar funciones básicas mediante componentes electrónicos de bajo costo, controlar variables como la temperatura y el peso con gran precisión requiere sensores calibrados, mecanismos de regulación adecuados y pruebas experimentales que permitan validar el desempeño del sistema. Como siguiente paso, se propone incorporar el control automático del calentamiento, mejorar la regulación de la humedad y realizar mediciones repetidas de temperatura y peso para cuantificar los errores y evaluar las mejoras del prototipo.
 
-Los movimientos pueden modificar la presión y el contacto entre los electrodos y la piel, produciendo cambios que no necesariamente corresponden a una respuesta fisiológica real. La literatura identifica específicamente el movimiento como una de las fuentes importantes de artefactos en mediciones portátiles de EDA [8].
+## 15. PREGUNTAS PARA LA DISCUSIÓN
 
-Esto representa una de las principales limitaciones del prototipo.
+### Pregunta 1. ¿Qué otras variables, y por qué, además de las mencionadas son críticas en el monitoreo neonatal?
 
-### Hipótesis fisiológica
+Además de la temperatura, la humedad y el flujo de aire, existen otras variables relevantes para evaluar el estado del recién nacido. Entre ellas se encuentran la frecuencia cardiaca, la frecuencia respiratoria, la saturación de oxígeno y, cuando está indicado clínicamente, la presión arterial. Estas variables proporcionan información sobre el funcionamiento cardiovascular y respiratorio.
 
-A partir de los resultados obtenidos se plantea la siguiente hipótesis:
+La concentración de oxígeno también es importante cuando se administra oxígeno suplementario, mientras que la temperatura cutánea puede complementar la evaluación térmica. Asimismo, el ruido y la iluminación del entorno deben considerarse porque forman parte de las condiciones ambientales que rodean al neonato.
 
-Cuando una persona realiza una actividad que requiere mayor concentración o genera una mayor activación emocional, aumenta la activación del sistema nervioso simpático, lo que puede incrementar la actividad de las glándulas sudoríparas y producir cambios detectables en la conductancia de la piel.
+La medición de estas variables requiere sensores y equipos apropiados para cada función. En una incubadora clínica, su integración depende de las necesidades del paciente y de las características del equipo utilizado [2], [3].
 
-Esta hipótesis es coherente con la utilización de la EDA como indicador periférico de activación simpática [1], [3].
+### Pregunta 2. ¿Qué haría falta para convertir el sistema desarrollado en una incubadora neonatal real?
 
-## CONCLUSIONES
+Para convertir el prototipo en una incubadora neonatal apta para uso clínico sería necesario realizar modificaciones importantes en el sistema de control, los sensores, la estructura y las medidas de seguridad.
+
+En primer lugar, se necesitaría un sistema de calentamiento regulado automáticamente mediante un controlador que mantenga la temperatura de referencia y reduzca el riesgo de sobrecalentamiento. También sería necesario incorporar sensores calibrados, verificar la uniformidad térmica dentro de la cabina e implementar un sistema de humidificación con medición y regulación de la humedad.
+
+Además, deberían incorporarse alarmas para detectar temperaturas fuera de rango, fallas de sensores y pérdida de alimentación. La circulación del aire tendría que evaluarse para comprobar que la distribución del calor sea adecuada y que no se produzcan corrientes perjudiciales.
+
+El sistema de medición del peso también requeriría una plataforma apropiada y una calibración verificable. De igual manera, la estructura debería construirse con materiales seguros, resistentes y fáciles de limpiar y desinfectar.
+
+Finalmente, sería indispensable realizar pruebas de seguridad eléctrica, gestión de riesgos, confiabilidad y desempeño, además de cumplir los requisitos regulatorios aplicables a los dispositivos médicos. Estas condiciones demuestran que convertir un prototipo académico en una incubadora real exige mucho más que integrar sensores y programar un microcontrolador.
+
+### Pregunta 3. ¿Qué semejanzas hay entre una incubadora neonatal y una servocuna?
+
+La incubadora neonatal y la servocuna tienen como finalidad contribuir al mantenimiento de una temperatura apropiada para el recién nacido. Ambas pueden utilizar sensores, sistemas de calentamiento, controles electrónicos y alarmas para vigilar las condiciones térmicas.
+
+La principal diferencia se encuentra en su estructura y en la forma de transferir el calor. La incubadora neonatal utiliza una cámara cerrada que proporciona un microambiente protegido y permite controlar las condiciones internas. La servocuna o cuna radiante utiliza un elemento calefactor situado por encima del paciente, que transmite calor principalmente mediante radiación y permite un acceso más directo durante los procedimientos clínicos.
+
+En consecuencia, ambos equipos comparten el objetivo de favorecer la estabilidad térmica del neonato, pero se diferencian en la forma de proporcionar calor, el nivel de aislamiento y la facilidad de acceso al paciente [3], [7].
 
 ## REFERENCIAS
 
-[1] A. H. C. van der Kraaij et al., “Role and Status of Biomarkers in Technostress Research: A Systematic Review,” International Journal of Environmental Research and Public Health, 2024.
+[1] Universidad Militar Nueva Granada, “Diseño y construcción de una incubadora neonatal a escala,” *Guía de laboratorio de Instrumentación Biomédica y Biosensores*, 2025.
 
-[2] 
+[2] World Health Organization, *Standards for Improving the Quality of Care for Small and Sick Newborns in Health Facilities*. Geneva, Switzerland: WHO, 2020.
+
+[3] Dräger, “Isolette 8000 plus.” [En línea]. Disponible en: https://www.draeger.com/en-us_us/Products/isolette-8000-plus. [Accedido: 13-oct-2026].
+
+[4] Dräger, “Isolette 8000 plus: información del producto.” [En línea]. Disponible en: https://www.draeger.com/Content/Documents/Products/PI/en_sa/isolette-8000-plus-Product-Information-en-sa.pdf. [Accedido: 13-oct-2026].
+
+[5] Instrumentalia S.A.S., “Incubadora YP2000.” [En línea]. Disponible en: https://instrumentalia.com.co/medicina/61297-incubadora-yp2000.html. [Accedido: 13-oct-2026].
+
+[6] LEEX Medical, “Incubadora neonatal B3.” [En línea]. Disponible en: https://leexmedical.com/product/incubadora-neonatal-b3/. [Accedido: 13-oct-2026].
+
+[7] LEEX Medical, “Cuna radiante BQ80.” [En línea]. Disponible en: https://leexmedical.com/product/servocuna/. [Accedido: 13-oct-2026].
+
+[8] Interlink Electronics, “FSR 400 Series Data Sheet.” [En línea]. Disponible en: https://www.interlinkelectronics.com/downloads/datasheets/fsr-400-series-datasheet.pdf. [Accedido: 13-oct-2026].
